@@ -1,0 +1,10 @@
+.genres {
+  border: 5px solid #2fe041;
+  text-align: center;
+  background-color: #e99ff5;
+}
+.movie_summary {
+  font-size: 1.2em;
+  font-weight: 900;
+  font-style: italic;
+}
