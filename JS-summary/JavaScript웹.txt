@@ -1,0 +1,104 @@
+https://www.w3schools.com/js/js_htmldom_methods.asp
+https://www.w3schools.com/jquery/default.asp
+https://developer.mozilla.org/en-US/docs/Web/API/Node
+
+
+========================== Node(상속 Tree의 맨 위) ==========================
+childNodes (Read Only)
+firstChild, lastChild (Read Only)
+nextSibling, previousSibling (Read Only)
+nodeName (Read Only)
+ownerDocument (Read Only)
+parentNode(Read Only, Node 타입을 반환)
+parentElement(Read Only, Element 타입을 반환)
+
+textContent
+
+
+
+var aChild = element.appendChild(aChild); // 이동한 자식 노드를 반환
+
+var dupNode = node.cloneNode(deep); // dupNode=복제된 노드, node=복제되어야 할 node, deep=Optional[true/false]
+
+node.hasChildNodes() // 자식노드가 있는지 Boolean 값으로 반환
+
+var insertedNode = parentNode.insertBefore(newNode, referenceNode);
+// referenceNode가 null 이면 newNode가 자식 노드의 리스트의 맨 끝에 삽입
+
+var oldChild = node.removeChild(child); // oldChild === child
+
+let oldChild = parentNode.replaceChild(newChild, oldChild); // replacedNode === oldChild
+
+
+
+
+========================== Document(Node를 상속받음) ==========================
+Document() (생성자, 새로운 Document 객체를 생성)
+
+anchors (Read Only)
+body
+forms (Read Only, <form> element들이 담긴 collection(HTMLCollection)을 반환)
+head (Read Only)
+hidden (Read Only)
+children (Read Only, HTMLCollection을 반환)
+dir
+location (Read Only, window.location과 다르다)
+URL (Read Only)
+
+
+
+createElement(tagName)
+createTextNode(textNode)
+
+getElementsByClassName()
+getElementsByTagName()
+getElementById()
+querySelector()
+querySelectorAll()
+
+
+
+
+
+========================== Element(Node를 상속받음) ==========================
+attributes
+id
+innerHTML, outerHTML
+tagName
+
+
+
+
+addEventListener()
+getAttribute(attrName)
+hasAttribute(attrName)
+removeAttribute(attrName)
+setAttribute(name, value)
+
+getElementsByClassName()
+getElementsByTagName()
+getElementById()
+querySelector()
+querySelectorAll()
+
+
+
+
+========================== AJAX ==========================
+
+
+
+========================== JSON ==========================
+JSON.stringify(object) //객체 또는 배열을 JSON 문자열로 바꾼다
+JSON.parse(jsonstr)    //json 문자열을 JavaScript 객체 또는 JavaScript 배열로 바꾼다
+
+▶ JSON 데이터 타입
+- string
+- number
+- object (JSON object)
+- array
+- boolean
+- null
+(function, date, undefined 타입은 JSON 데이터 타입이 아니다)
+
+
