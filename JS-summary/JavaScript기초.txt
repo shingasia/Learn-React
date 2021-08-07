@@ -85,6 +85,7 @@ null
 NaN
 ("") 빈 문자열
 
+
 if (condition_1) {
   statement_1;
 } else if (condition_2) {
@@ -119,6 +120,44 @@ throw "Error2";   // String type
 throw 42;         // Number type
 throw true;       // Boolean type
 throw {toString: function() { return "I'm an object!"; } };
+
+
+
+// try-catch-finally
+openMyFile();
+try {
+  writeMyFile(theData); //This may throw a error
+} catch(e) {
+  handleError(e); // If we got a error we handle it
+} finally {
+  closeMyFile(); // always close the resource
+}
+
+
+▶ 만약 finally 블록이 값을 반환하였을 경우, try 블록과 catch블록의 return 문장과 상관없이 전체 try-catch-finally 블록의 반환값이 됩니다
+function f() {
+  try {
+    console.log(0);
+    throw "bogus";
+  } catch(e) {
+    console.log(1);
+    return true; // this return statement is suspended
+                 // until finally block has completed
+    console.log(2); // not reachable
+  } finally {
+    console.log(3);
+    return false; // overwrites the previous "return"
+    console.log(4); // not reachable
+  }
+  // "return false" is executed now
+  console.log(5); // not reachable
+}
+f(); // alerts 0, 1, 3; returns false
+
+
+
+
+
 
 //라벨을 이용한 중첩 반복문 continue 또는 break
 checkiandj:
@@ -204,6 +243,7 @@ startsWith, endsWith, includes
 concat
 split
 slice, substring
+replaceAll // ECMAScript12(ES12 이상 버전)
 match, replace, search // 정규 표현식으로 작업한다
 toLowerCase
 toUpperCase
@@ -1010,12 +1050,5 @@ async 함수에는 await식이 포함될 수 있습니다.
 
 await 키워드는 async 함수에서만 유효하다는 것을 기억하십시오.
 --------------------------------------------------------
-
-
-
-
-
-
-
 
 

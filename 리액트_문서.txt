@@ -1,0 +1,341 @@
+<<<<< 주요 개념 >>>>>
+
+4. Component와 Props
+- 컴포넌트 이름은 항상 대문자로 시작한다
+- Props는 읽기 전용이다(함수 컴포넌트나 클래스 컴포넌트 모두 자체 props를 수정해서는 안된다)
+- React가 사용자 정의 컴포넌트로 작성한 엘리먼트를 발견하면 JSX 어트리뷰트와 자식을 해당 컴포넌트에 전달합니다. 이 객체를 "props"라고 합니다.
+<Welcome name="Sara" /> // {name: 'Sara'}를 props로 하여 Welcome 컴포넌트를 호출
+
+
+
+// OK!
+function sum(a, b){
+  return a+b;
+}
+// NO!
+function withdraw(account, amount) {
+  account.total -= amout;
+}
+- 
+
+
+5. State와 생명주기
+- 메서드를 바인딩하거나 state를 초기화하는 작업이 없다면, 해당 React 컴포넌트에는 생성자를 구현하지 않아도 됩니다
+- constructor() 내부에서 setState()를 호출하면 안된다
+- 함수 컴포넌트를 클래스 컴포넌트로 변환
+1) React.Component를 확장하는 동일한 이름의 ES6 class를 생성
+2) render() 라고 불리는 빈 메서드를 추가
+3) 함수의 내용을 render() 메서드 안으로 옮긴다
+4) render() 내용 안에 있는 props를 this.props로 변경
+5) 남아있는 빈 함수 선언을 삭제한다
+
+
+- 클래스 컴포넌트는 항상 props로 기본 constructor를 호출해야 한다
+- componentDidMount() 메서드는 컴포넌트 출력물이 DOM에 렌더링 된 후에 시행된다
+- 직접 State를 수정하지 말고 setState()를 사용해야 한다
+(this.state를 지정할 수 있는 유일한 공간은 constructor 뿐이다.)
+- ▶▶▶ State 업데이트는 비동기적일 수도 있다
+React는 성능을 위해 여러 setState() 호출을 단일 업데이트로 한꺼번에 처리할 수 있다.
+this.props와 this.state가 비동기적으로 업데이트될 수 있기 때문에 -> 다음 state를 계산할 때 해당 값에 의존해서는 안된다
+
+
+// Wrong -> 값에 의존해서는 안됨
+this.setState({
+  counter: this.state.counter + this.props.increment,
+});
+---------------------------------------------------------------------------
+이를 수정하기 위해 객체보다는 함수를 인자로 사용하는 다른 형태의 setState()를 사용합니다. 
+setState(updater, [callback])
+updater는 (state, props) => stateChange 의 형태이다.
+그 함수는 이전 state를 첫 번째 인자로 받아들일 것이고, 
+업데이트가 적용된 시점의 props를 두 번째 인자로 받아들일 것입니다
+---------------------------------------------------------------------------
+// Correct1 (화살표 함수)
+this.setState((state, props) => ({
+  counter: state.counter + props.increment
+}));
+
+// Correct2 (일반 함수)
+this.setState(function(state, props) {
+  return {
+    counter: state.counter + props.increment
+  };
+});
+
+- State 업데이트는 병합된다. (setState()를 호출할 때 React는 제공한 객체를 현재 state로 병합한다)
+- 데이터는 아래로 흐릅니다 
+(컴포넌트는 자신의 state를 자식 컴포넌트에 props로 전달할 수 있다)
+▶ 모든 state는 항상 특정한 컴포넌트가 소유하고 있으며 그 state로부터 바생된 UI 또는 데이터는 오직 트리구조에서 자신의 '아래'에 있는 컴포넌트에만 영향을 미친다)
+
+
+
+
+React 생명주기
+===================================================================================
+생명주기 도표
+https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/
+자주 사용하는 함수는 '@'로 표시했다
+
+1) 마운트
+@ constructor()
+static getDerivedStateFromProps(props, state)
+@ render()
+@ componentDidMount()
+
+2) 업데이트
+static getDerivedStateFromProps(props, state)
+shouldComponentUpdate()
+@ render()
+getSnapshotBeforeUpdate()
+@ componentDidUpdate(prevProps, prevState, snapshot)
+
+3) 마운트 해제
+@ componentWillUnmount()
+
+forceUpdate(callback)
+- render() 메서드가 다른 데이터값에 의존하는 경우, 
+React로 하여금 forceUpdate()를 호출하여 렌더링을 다시 수행하도록 만들 수 있습니다.
+forceUpdate()를 호출하면 컴포넌트의 render()가 호출되는데, 이때 shouldComponentUpdate()는 무시하고 건너뜁니다. 
+그러면 자식 컴포넌트들에 대하여 통상적인 생명주기 메서드가 실행되는데, 여기에는 개별 자식들의 shouldComponentUpdate()도 포함됩니다.
+
+
+
+
+
+6. 이벤트 처리하기
+- React의 이벤트는 소문자 대신 캐멀 케이스(camelCase)를 사용합니다.
+- JSX를 사용하여 문자열이 아닌 함수로 이벤트 핸들러를 전달합니다.
+- e.preventDefault(); 명시적으로 호출해야 한다
+- this를 바인딩 해줘야 한다
+
+
+
+function ActionLink() {
+  function handleClick(e) {
+    e.preventDefault();
+    console.log('The link was clicked.');
+  }
+  return (
+    <a href="#" onClick={handleClick}>
+      Click me
+    </a>
+  );
+}
+
+
+
+function LoginButton(props) {
+    return (
+      <button onClick={props.onClick}>
+        Login
+      </button>
+    );
+}
+  
+function LogoutButton(props) {
+    return (
+      <button onClick={props.onClick}>
+        Logout
+      </button>
+    );
+}
+
+
+
+class LoginControl extends React.Component {
+    constructor(props){
+        super(props);
+
+        this.state = {
+            isLogined: false
+        };
+
+        this.handleLoginClick = this.handleLoginClick.bind(this);
+        this.handleLogoutClick = this.handleLogoutClick.bind(this);
+    }
+
+    handleLoginClick(){
+        this.setState({isLogined: true});
+    }
+
+    handleLogoutClick(){
+        this.setState({isLogined: false});
+    }
+
+
+    render(){
+        const isLogined = this.state.isLogined;
+
+        let button;
+
+        if(isLogined){
+            button = <LogoutButton onClick={this.handleLogoutClick} />;
+        }else{
+            button = <LoginButton onClick={this.handleLoginClick} />;
+        }
+
+        return (
+            <div>
+                <Greeting isLogined={isLogined} />
+                {button}
+            </div>
+        )
+    }
+}
+
+
+
+7. 조건부 렌더링
+- && 연산자를 이용한 조건부 렌더링
+(JavaScript에서 true && expression은 항상 expression으로 평가되고 false && expression은 항상 false로 평가됩니다.)
+- null을 반환하면 렌더링을 막을 수 있다.
+
+
+// && 연산자를 이용한 조건에 따른 렌더링
+function Mailbox(props) {
+  const unreadMessages = props.unreadMessages;
+  return (
+    <div>
+      <h1>Hello!</h1>
+      {unreadMessages.length > 0 &&
+        <h2>
+          You have {unreadMessages.length} unread messages.
+        </h2>
+      }
+    </div>
+  );
+}
+
+
+// 이런식으로도 가능!!
+render() {
+  const isLoggedIn = this.state.isLoggedIn;
+  return (
+    <div>
+      {isLoggedIn
+        ? <LogoutButton onClick={this.handleLogoutClick} />
+        : <LoginButton onClick={this.handleLoginClick} />
+      }
+    </div>
+  );
+}
+
+
+// null을 반환하는 예제
+function WarningBanner(props) {
+  if (!props.warn) {
+    return null;
+  }
+
+  return (
+    <div className="warning">
+      Warning!
+    </div>
+  );
+}
+class Page extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {showWarning: true};
+    this.handleToggleClick = this.handleToggleClick.bind(this);
+  }
+
+  handleToggleClick() {
+    this.setState(state => ({
+      showWarning: !state.showWarning
+    }));
+  }
+
+  render() {
+    return (
+      <div>
+        <WarningBanner warn={this.state.showWarning} />
+        <button onClick={this.handleToggleClick}>
+          {this.state.showWarning ? 'Hide' : 'Show'}
+        </button>
+      </div>
+    );
+  }
+}
+
+
+
+8. 리스트와 Key
+- Key는 React가 어떤 항목을 변경, 추가 또는 삭제할지 식별하는 것을 돕습니다.
+- key를 선택하는 가장 좋은 것은 리스트의 다른 항목들 사이에서 해당 항목을 고유하게 식별할 수 있는 문자열이다.
+
+const numbers = [1, 2, 3, 4, 5];
+const listItems = numbers.map((number) => <li key={number.toString()}>{number}</li>);
+
+// 
+function Blog(props) {
+  const sidebar = (
+    <ul>
+      {props.posts.map((post) =>
+        <li key={post.id}>
+          {post.title}
+        </li>
+      )}
+    </ul>
+  );
+  const content = props.posts.map((post) =>
+    <div key={post.id}>
+      <h3>{post.title}</h3>
+      <p>{post.content}</p>
+    </div>
+  );
+  return (
+    <div>
+      {sidebar}
+      <hr />
+      {content}
+    </div>
+  );
+}
+
+const posts = [
+  {id: 1, title: 'Hello World', content: 'Welcome to learning React!'},
+  {id: 2, title: 'Installation', content: 'You can install React from npm.'}
+];
+ReactDOM.render(
+  <Blog posts={posts} />,
+  document.getElementById('root')
+);
+
+
+
+9. 폼(form)
+- HTML에서 <input>, <textarea>, <select>와 같은 폼 엘리먼트는 사용자의 입력을 기반으로 자신의 state를 관리, 업데이트한다.
+- React에서는 변경할 수 있는 state가 일반적으로 컴포넌트의 state 속성에 유지되며 setState()에 의해 업데이트된다.
+- <form>을 렌더링하는 React컴포넌트는 사용자 입력값을 state로 관리해야 한다(그래서 폼 엘리먼트의 value값은 this.state.value가 된다)
+- React에서 <textarea>는 value 어트리뷰트를 사용한다
+
+// <select> 예제 -> React에서는 selected 어트리뷰트를 사용하는 대신 최상단 select태그에 value 어트리뷰트를 사용
+<select value={this.state.value} onChange={this.handleChange}>
+   <option value="grapefruit">Grapefruit</option>
+   <option value="lime">Lime</option>
+   <option value="coconut">Coconut</option>
+   <option value="mango">Mango</option>
+</select>
+
+// <textarea> 예제
+<textarea value={this.state.value} onChange={this.handleChange} />
+
+// <input> 예제
+<input
+   name="isGoing"
+   type="checkbox"
+   checked={this.state.isGoing}
+   onChange={this.handleInputChange} />
+
+
+
+
+
+
+
+
+
+
+
+

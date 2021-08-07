@@ -1,0 +1,110 @@
+1. Hook 소개
+Hook은 클래스 안에서 동작하지 않습니다. 하지만 클래스를 작성하지 않고 사용할 수 있습니다.
+
+
+2~3. Hook 개요, State Hook 사용하기
+
+import React, {useState} from 'react';
+
+function Example(){
+  const [count, setCount] = useState(0);
+  
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count+1)}>
+        Click me
+      </button>
+    </div>
+  );
+}
+
+- useState()는 현재의 state값과 이 값을 업데이트하는 함수를 쌍으로 제공
+- class의 this.setState()와 거의 유사하지만, 이전 state와 새로운 state를 합치지 않는 다는 차이가 있다.
+- this.state와는 달리 Hook의 state는 객체일 필요가 없다.(물론 원한다면 객체로도 가능)
+- 함수 컴포넌트는 this를 가질 수 없기 때문에 this.state를 할당하거나 읽을 수 없습니다. 대신, useState Hook을 직접 컴포넌트에 호출합니다.
+
+
+function ExampleWithManyStates() {
+  // state 변수를 여러 개 선언 -> age, fruit, todos는 지역 변수이고, 개별적으로 갱신할 수 있다.
+  const [age, setAge] = useState(22);
+  const [fruit, setFruit] = useState('banana');
+  const [todos, setTodos] = useState([{ text: 'Learn Hooks' }]);
+  
+}
+
+
+function Example() {
+  const [count, setCount] = useState(0);
+  
+  // componentDidMount, componentDidUpdate와 비슷합니다.
+  useEffect( () => {
+    document.title = `You clicked ${count} times`;
+  });
+
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={ () => setCount(count+1)}>
+        Click me
+      </button>
+    </div>
+  );
+}
+
+- useEffect()를 사용하면, React는 DOM을 바꾼 뒤에 “effect” 함수를 실행할 것입니다.
+- Effects는 컴포넌트 안에 선언되어있기 때문에 props와 state에 접근할 수 있습니다.
+- 기본적으로 React는 매 렌더링 이후에 effects를 실행합니다. 첫 번째 렌더링도 포함해서요.
+- useState와 마찬가지로 컴포넌트 내에서 여러 개의 effect를 사용할 수 있습니다.
+
+▶ Hook은 그냥 JavaScript 함수이지만, 두 가지 규칙을 준수해야 한다.
+- 최상위(at the top level)에서만 Hook을 호출해야 합니다. 반복문, 조건문, 중첩된 함수 내에서 Hook을 실행하지 마세요. 
+- React 함수 컴포넌트 내에서만 Hook을 호출해야 합니다. 일반 JavaScript 함수에서는 Hook을 호출해서는 안 됩니다.
+
+
+4. Effect Hook 사용하기
+- Effect Hook을 사용하면 함수 컴포넌트에서 side effect를 수행할 수 있습니다.
+(데이터 가져오기, 구독(subscription) 설정하기, 수동으로 리액트 컴포넌트의 DOM을 수정하는 것까지 이 모든 것이 side effects입니다.)
+- 리액트의 class 생명주기 메서드에 친숙하다면, useEffect Hook을 componentDidMount와 componentDidUpdate, componentWillUnmount가 합쳐진 것으로 생각해도 좋습니다.
+- useEffect가 하는 일은 무엇인가?
+리액트에게 컴포넌트가 렌더링 이후에 어떤 일을 수행해야하는 지를 말합니다.
+React는 DOM 업데이트를 수행한 이후에 useEffect에 넘긴 함수를 불러낼 것입니다.
+(데이터를 가져오거나 다른 API를 불러내는 일도 가능)
+
+- useEffect는 렌더링 이후에 매번 수행되는 걸까요?
+네, 기본적으로 첫번째 렌더링과 이후의 모든 업데이트에서 수행됩니다.(나중에 effect를 필요에 맞게 수정하는 방법에 대해 다룰 것입니다.)
+React는 effect가 수행되는 시점에 이미 DOM이 업데이트되었음을 보장합니다.
+
+- componentWillUnmount()처럼 정리(clean-up)를 이용하는 Effects
+▶ useEffect()에 전달되는 effect가 함수를 반환하면 React는 그 함수를 정리가 필요한 때에 실행시킨다.
+
+- 리액트가 effect를 정리(clean-up)하는 시점은 정확히 언제일까요? 
+리액트는 컴포넌트가 마운트 해제되는 때에 정리(clean-up)를 실행합니다.
+
+모든 렌더링 이후에 effect를 정리(clean-up)하거나 적용하는 것이 때때로 성능 저하를 발생시키는 경우도 있습니다. 
+클래스 컴포넌트의 경우에는 componentDidUpdate에서 prevProps나 prevState와의 비교를 통해 이러한 문제를 해결할 수 있습니다.
+
+componentDidUpdate(prevProps, prevState) {
+  if (prevState.count !== this.state.count) {
+    document.title = `You clicked ${this.state.count} times`;
+  }
+}
+
+▶ 특정 값들이 리렌더링 시에 변경되지 않는다면 리액트로 하여금 effect를 건너뛰도록 할 수 있습니다. useEffect의 선택적 인수인 두 번째 인수로 배열을 넘기면 됩니다.
+
+useEffect(() => {
+  document.title = `You clicked ${count} times`;
+}, [count]); // count가 바뀔 때만 effect를 재실행합니다. 같으면 effecf를 건너뛰게 된다.
+
+useEffect(() => {
+  // ....
+}, [props.username]);
+
+
+
+
+
+
+
+
+
